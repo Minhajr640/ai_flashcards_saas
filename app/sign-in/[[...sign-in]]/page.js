@@ -4,7 +4,7 @@ import { SignIn } from '@clerk/nextjs'
 
 export default function SignUpPage() {
     return (
-        <Container maxWidth="sm">
+        <Container maxWidth="100vw">
             <AppBar position="static" sx ={{backgroundColor: "#3f5ab5"}}>
                     <Toolbar>
                         <Typography

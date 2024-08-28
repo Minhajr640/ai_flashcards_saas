@@ -18,8 +18,8 @@ export default function Home() {
             Flashcard.io
           </Typography>
           <SignedOut>
-            <Button color="inherit"> Login</Button>
-            <Button color ="inherit">Sign Up</Button>
+            <Button color="inherit" href="/sign-in"> Sign In</Button>
+            <Button color ="inherit" href="/sign-up">Sign Up</Button>
           </SignedOut>
           <SignedIn>
             <UserButton />
