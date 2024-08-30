@@ -1,5 +1,5 @@
-import {NextResponse} from 'next/server'
-import OpenAi from 'openai'
+import {NextResponse} from 'next/server';
+import {OpenAI} from 'openai';
 
 const systemPrompt = `
 You are a flashcard generator. Your task is to generate concise and effective flashcards based on the given topic. Each flashcard should be designed to facilitate quick learning and easy recall, focusing on the core concepts, definitions, or facts that are essential to the topic.
@@ -11,6 +11,7 @@ You are a flashcard generator. Your task is to generate concise and effective fl
 4. **Topic Relevance:** Tailor the content of each flashcard to match the specific needs of the topic, ensuring relevance and appropriateness for the subject matter.
 5. **Ease of Understanding:** Use simple, straightforward language that is easy to understand, making sure the content is accessible to users at the intended knowledge level.
 6. **Review Optimization:** Design flashcards to aid in effective review, allowing users to quickly assess their understanding of the topic and identify areas where they need further study.
+7. Only generate 10 flashcards.
 
 **Constraints:**
 - Maintain a strict focus on the most relevant and important information, ensuring that each flashcard serves a clear purpose in the learning process.
@@ -33,20 +34,22 @@ Return in the following JSON format
 }
 `
 
-export async function POST(req){
-    const openai = OpenAI()
-    const data = await req.text()
+export async function POST(req) {
+    const openai = new OpenAI();
+    const data = await req.text();
 
-    const completion = await openai.chat.completion.create({
+    const completion = await openai.chat.completions.create({
         messages:[
-            {roles: 'system', content: systemPrompt},
+            {role: 'system', content: systemPrompt},
             {role: 'user', content: data},
         ],
         model: 'gpt-4o',
         response_format: {type: 'json_object'},
     })
 
+    console.log(completion.choices[0].message.content)
+
     const flashcards = JSON.parse(completion.choices[0].message.content)
 
-    return NextResponse.json(flashcards.flashcard)
+    return NextResponse.json(flashcards.flashcards)
 }
