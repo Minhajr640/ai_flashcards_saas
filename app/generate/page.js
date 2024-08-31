@@ -1,12 +1,11 @@
 'use client'
 
 import { useUser } from "@clerk/nextjs"
-import { useRouter } from "next/router"
+import { useRouter } from "next/navigation"
 import { Box, Container, Typography, Paper, TextField, Button, CardActionArea, CardContent, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, Card } from "@mui/material"
 import { useState } from "react"
 import { db } from "@/firebase"
-import { WriteBatch } from "firebase/firestore"
-import {doc, collection, setDoc, getDoc, WriteBatch} from 'firebase/firestore'
+import {doc, collection, setDoc, getDoc, writeBatch} from 'firebase/firestore'
 
 
 export default function Generate() {
@@ -16,7 +15,7 @@ export default function Generate() {
     const [text, setText] = useState('')
     const [name, setName] = useState('')
     const [open, setOpen] = useState(false)
-    const router = useRouter
+    const router = useRouter();
 
     const handleSubmit = async ()=>{
         fetch('api/generate', {
@@ -46,7 +45,7 @@ export default function Generate() {
             return
         }
 
-        const batch = WriteBatch(db)
+        const batch = new writeBatch(db)
         const userDocRef = doc(collection(db, 'users'), user.id)
         const docSnap = await getDoc(userDocRef)
 
