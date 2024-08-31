@@ -8,11 +8,11 @@ import { useRouter } from "next/navigation"
 import { Card, CardActionArea, CardContent, Container, Grid, Typography } from '@mui/material'
 
 export default function Flashcards() {
-    const [isLoaded, isSignedIn, user] = useUser()
+    const {isLoaded, isSignedIn, user} = useUser()
     const [flashcards, setFlashcards] = useState([])
     const router = useRouter()
 
-    useEffect(() =>(
+    useEffect(() => {
         async function getFlashcards() {
             if (!user) return
                 const docRef = doc(collection(db, 'users'), user.id)
@@ -21,14 +21,14 @@ export default function Flashcards() {
                 if (docSnap.exists()) {
                     const collections = docSnap.data().flashcards || []
                     console.log(collections)
-                    setFlashcards(collection)
+                    setFlashcards(collections)
                 }
                 else {
                     await setDoc(docRef, {flashcards: []})
                 }
         }
         getFlashcards()
-    ), [user])
+    }, [user])
 
     if (!isLoaded || !isSignedIn) {
         return <></>
