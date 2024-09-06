@@ -2,15 +2,15 @@
 
 import { useUser} from "@clerk/nextjs"
 import { useEffect, useState } from "react"
-import {collection, doc, getDoc, getDocs} from 'firebase/firestore'
+import {collection, doc, getDocs} from 'firebase/firestore'
 import { db } from "@/firebase"
 import { useSearchParams } from "next/navigation"
-import { Box, Container, Typography, Paper, TextField, Button, CardActionArea, CardContent, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, Card } from "@mui/material"
+import { Box, Container, Typography, CardActionArea, Grid, Card } from "@mui/material"
 
-export default function Flashcard(){
+export default function Flashcard() {
     const {isLoaded, isSignedIn, user} = useUser()
     const [flashcards, setFlashcards] = useState([])
-    const [flipped, setFlipped] = useState([])
+    const [flipped, setFlipped] = useState({})
 
     const searchParams = useSearchParams()
     const search = searchParams.get('id')
@@ -18,19 +18,24 @@ export default function Flashcard(){
     useEffect(() => {
         async function getFlashcard() {
             if (!search || !user) return
-            const colRef = collection(doc(collection(db, 'users'), user.id), search)
-            const docs = await getDocs(colRef)
-            const flashcards = []
+            try {
+                const colRef = collection(doc(collection(db, 'users'), user.id), search)
+                const docs = await getDocs(colRef)
+                const flashcards = []
 
-            docs.forEach((doc)=>{
-                flashcards.push({id: doc.id, ...doc.data()})
-            })
-            setFlashcards(flashcards)
+                docs.forEach((doc) => {
+                    flashcards.push({id: doc.id, ...doc.data() })
+                })
+                setFlashcards(flashcards)
+            } catch (error) {
+                console.error("Error fetching flashcards:", error)
+            }
+                
         }
         getFlashcard()
     }, [user, search])
 
-    const handleCardClick = (id) =>{
+    const handleCardClick = (id) => {
         setFlipped((prev) => ({
             ...prev,
             [id]: !prev[id],
@@ -49,11 +54,11 @@ export default function Flashcard(){
                     <Typography variant="h5">Flashcards Preview</Typography>
                     <Grid container spacing ={3}>
                         {flashcards.map((flashcard, index) =>(
-                            <Grid item xs = {12} sm = {6} md = {4} key = {index}>
+                            <Grid item xs = {12} sm = {6} md = {4} key = {flashcard.id}>
                                 <Card>
                                     <CardActionArea
                                         onClick={() => {
-                                            handleCardClick(index)
+                                            handleCardClick(flashcard.id)
                                         }}
                                     >
                                         <CardContent>
@@ -67,7 +72,7 @@ export default function Flashcard(){
                                                         width: '100%',
                                                         height:'200px',
                                                         boxShadow: '0.4px 8px 0 rgba(0,0,0, 0.2)',
-                                                        transform: flipped[index]
+                                                        transform: flipped[flashcard.id]
                                                             ? 'rotateY(180deg)'
                                                             : 'rotateY(0deg)',                                             
                                                     },
